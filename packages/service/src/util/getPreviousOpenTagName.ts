@@ -40,7 +40,11 @@ export const getPreviousOpeningTagName: (
       return undefined;
     }
     if (char === '>') {
-      if (scanner.stream.peekLeft(2) === '/') {
+      let p = 2;
+      while (p < scanner.stream.position && /\s/.test(scanner.stream.peekLeft(p))) {
+        p++;
+      }
+      if (scanner.stream.peekLeft(p) === '/') {
         selfClosing = true;
       }
       seenRightAngleBracket = true;
@@ -56,10 +60,13 @@ export const getPreviousOpeningTagName: (
       scanner.scan();
       const token = scanner.getTokenText();
       if (token === '') {
+        if (isReact) {
+          stack.push('');
+        }
         offset = scanner.stream.position - 1;
         continue;
       }
-      stack.push(scanner.getTokenText());
+      stack.push(token);
       continue;
     }
     offset = scanner.stream.position;

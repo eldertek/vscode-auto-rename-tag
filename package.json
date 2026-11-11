@@ -1,4 +1,12 @@
 {
+  "name": "auto-rename-tag",
+  "version": "0.1.11",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "sponsor": {
+    "url": "https://www.patreon.com/eldertek"
+  },
   "scripts": {
     "postinstall": "lerna bootstrap && tsc -b",
     "dev": "tsc -b -w",

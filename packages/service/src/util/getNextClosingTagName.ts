@@ -90,8 +90,12 @@ export const getNextClosingTagName: (
       if (scanner.stream.previousChars(2) === '--') {
         return undefined;
       }
-      if (scanner.stream.peekLeft(1) === '/') {
-        const charBefore = scanner.stream.peekLeft(2);
+      let p = 1;
+      while (p < scanner.stream.position && /\s/.test(scanner.stream.peekLeft(p))) {
+        p++;
+      }
+      if (scanner.stream.peekLeft(p) === '/') {
+        const charBefore = scanner.stream.peekLeft(p + 1);
         if (!/[\s"'\}]/.test(charBefore)) {
           const codeBefore = scanner.stream
             .getSource()

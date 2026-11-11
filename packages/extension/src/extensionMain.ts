@@ -71,17 +71,23 @@ let lastChangeByAutoRenameTag: { fsPath: string; version: number } = {
 };
 
 const applyResults: (results: Result[]) => Promise<void> = async results => {
-  assertDefined(vscode.window.activeTextEditor);
-  const prev = vscode.window.activeTextEditor.document.version;
-  const applied = await vscode.window.activeTextEditor.edit(
+  const editor = vscode.window.activeTextEditor;
+  if (!editor || !results.length) {
+    return;
+  }
+  const prev = editor.document.version;
+  const applied = await editor.edit(
     editBuilder => {
-      assertDefined(vscode.window.activeTextEditor);
+      const currentEditor = vscode.window.activeTextEditor;
+      if (!currentEditor) {
+        return;
+      }
       for (const result of results) {
         const startPosition =
-          vscode.window.activeTextEditor.document.positionAt(
+          currentEditor.document.positionAt(
             result.startOffset
           );
-        const endPosition = vscode.window.activeTextEditor.document.positionAt(
+        const endPosition = currentEditor.document.positionAt(
           result.endOffset
         );
         const range = new vscode.Range(startPosition, endPosition);
@@ -94,13 +100,17 @@ const applyResults: (results: Result[]) => Promise<void> = async results => {
     }
   );
 
-  const next = vscode.window.activeTextEditor.document.version;
+  const activeEditor = vscode.window.activeTextEditor;
+  if (!activeEditor) {
+    return;
+  }
+  const next = activeEditor.document.version;
   if (!applied) {
     return;
   }
   lastChangeByAutoRenameTag = {
-    fsPath: vscode.window.activeTextEditor.document.uri.fsPath,
-    version: vscode.window.activeTextEditor.document.version
+    fsPath: activeEditor.document.uri.fsPath,
+    version: activeEditor.document.version
   };
   if (prev + 1 !== next) {
     return;
@@ -328,7 +338,9 @@ export const activate: (
             delete wordsAtOffsets[key];
           }
         }
-        assertDefined(previousText);
+        if (previousText === undefined) {
+          previousText = currentText;
+        }
         const line = event.document.lineAt(change.range.start.line);
         const lineStart = event.document.offsetAt(line.range.start);
         const lineChangeOffset = change.rangeOffset - lineStart;
@@ -367,9 +379,12 @@ export const activate: (
         previousText = currentText;
         return;
       }
-      assertDefined(vscode.window.activeTextEditor);
+      if (!vscode.window.activeTextEditor) {
+        previousText = currentText;
+        return;
+      }
       previousText = currentText;
-      doAutoCompletionElementRenameTag(languageClientProxy, tags);
+      doAutoCompletionElementRenameTag(languageClientProxy, tags).catch(() => {});
     });
   };
   setPreviousText(vscode.window.activeTextEditor);

@@ -119,7 +119,11 @@ export const doAutoRenameTag: (
     if (!hasAdvanced) {
       return undefined;
     }
-    if (scanner.stream.peekLeft(1) === '/') {
+    let p = 1;
+    while (p < scanner.stream.position && /\s/.test(scanner.stream.peekLeft(p))) {
+      p++;
+    }
+    if (scanner.stream.peekLeft(p) === '/') {
       return undefined;
     }
     const possibleEndOfStartTag = scanner.stream.position;

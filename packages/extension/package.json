@@ -2,12 +2,15 @@
   "name": "auto-rename-tag",
   "displayName": "Auto Rename Tag",
   "description": "Auto rename paired HTML/XML tag",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "publisher": "formulahendry",
   "license": "MIT",
   "icon": "images/logo.png",
+  "sponsor": {
+    "url": "https://www.patreon.com/eldertek"
+  },
   "engines": {
-    "vscode": "^1.41.1"
+    "vscode": "^1.75.0"
   },
   "categories": [
     "Other",
@@ -31,7 +34,7 @@
     "url": "https://github.com/formulahendry/vscode-auto-rename-tag.git"
   },
   "activationEvents": [
-    "*"
+    "onStartupFinished"
   ],
   "main": "dist/extensionMain.js",
   "capabilities": {
